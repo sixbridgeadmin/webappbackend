@@ -121,8 +121,6 @@ module.exports = {
         </tbody>
       </table>
 
-      <p>Fecha: ${fechaAprobacion}</p>
-
       <p>Ante cualquier duda contáctenos al número “xxxxxxx” (símbolo de wassap o teléfono)<br>Atte., Sixbridge SPA</p>
     </body>
     </html>
