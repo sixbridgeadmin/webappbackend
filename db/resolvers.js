@@ -5,7 +5,7 @@ const Cliente = require("../models/Cliente");
 const Pedido = require("../models/Pedido");
 const Proveedor = require("../models/Proveedor");
 const CostoEnvio = require("../models/CostoEnvio");
-const sendEmail = require("../utils/emailService");
+//const sendEmail = require("../utils/emailService");
 const bcryptjs = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const { extendResolversFromInterfaces } = require("@graphql-tools/schema");
@@ -847,6 +847,7 @@ const resolvers = {
           })
         );
 
+        /*
         await sendEmail(
           pedidoPopulado.cliente.email,
           "Nuevo Pedido",
@@ -872,6 +873,7 @@ const resolvers = {
             total: pedidoPopulado.total,
           }
         );
+        */
 
         return pedidoPopulado;
       } catch (error) {
@@ -1017,6 +1019,7 @@ const resolvers = {
           })
         );
 
+        /*
         if (pedidoPopulado.estado === "Aprobado") {
           await sendEmail(
             pedidoPopulado.proveedor.email,
@@ -1041,7 +1044,9 @@ const resolvers = {
             }
           );
         }
+        */
 
+        /*
         if (pedidoPopulado.estado === "Observado") {
           await sendEmail(
             pedidoPopulado.vendedor.email,
@@ -1070,7 +1075,7 @@ const resolvers = {
             }
           );
         }
-
+        */
         return pedido;
       } catch (error) {
         console.error("Error al actualizar el pedido:", error);
@@ -1242,7 +1247,7 @@ const resolvers = {
     },
     notificarStockBajo: async (_, { idProducto }, context) => {
       try {
-        const { sendEmail } = context;
+        //const { sendEmail } = context;
 
         // Obtener umbral de variable de entorno o usar valor por defecto (5)
         const UMBRAL_STOCK_BAJO = process.env.UMBRAL_STOCK_BAJO
@@ -1257,15 +1262,16 @@ const resolvers = {
 
         if (producto.existencia <= UMBRAL_STOCK_BAJO) {
           // Obtener email de admin desde variables de entorno
-          const adminEmail = process.env.ADMIN_EMAIL || "contacto@sixbridge.cl";
+          //const adminEmail = process.env.ADMIN_EMAIL || "contacto@sixbridge.cl";
 
+          /*
           await sendEmail(adminEmail, "Stock bajo de producto", "stockBajo", {
             nombreProducto: producto.nombre,
             existenciaActual: producto.existencia,
             umbralStockBajo: UMBRAL_STOCK_BAJO,
             fecha: new Date().toLocaleDateString(),
           });
-
+          */
           return {
             success: true,
             message: `Notificación enviada - Stock bajo de ${producto.nombre} (${producto.existencia} unidades, umbral: ${UMBRAL_STOCK_BAJO})`,
