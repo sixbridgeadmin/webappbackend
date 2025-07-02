@@ -152,6 +152,7 @@ const typeDefs = gql`
   input AutenticarInput {
     email: String!
     password: String!
+    recaptchaToken: String!
   }
   input MarkComisionPagadaInput {
     pedidoId: ID!

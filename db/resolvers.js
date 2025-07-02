@@ -106,6 +106,26 @@ function convertToCSV(data) {
   return [headers, ...rows].join("\n");
 }
 
+// Función para verificar el token de reCAPTCHA
+async function verificarRecaptcha(token) {
+  const secret = process.env.RECAPTCHA_SECRET_KEY;
+  try {
+    const response = await fetch(
+      'https://www.google.com/recaptcha/api/siteverify',
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: `secret=${secret}&response=${token}`,
+      }
+    );
+    const data = await response.json();
+    return data.success;
+  } catch (error) {
+    console.error('Error al verificar reCAPTCHA:', error);
+    return false;
+  }
+}
+
 // Resolvers
 const resolvers = {
   Query: {
@@ -531,7 +551,12 @@ const resolvers = {
       }
     },
     autenticarUsuario: async (_, { input }) => {
-      const { email, password } = input;
+      const { email, password, recaptchaToken } = input;
+      // Validar reCAPTCHA
+      const recaptchaValido = await verificarRecaptcha(recaptchaToken);
+      if (!recaptchaValido) {
+        throw new Error("Falló la verificación de reCAPTCHA");
+      }
       // si el usuario existe
       const existeUsuario = await Usuario.findOne({ email });
       if (!existeUsuario) {
