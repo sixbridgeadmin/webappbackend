@@ -56,13 +56,13 @@ module.exports = {
           ${productosHTML}
         </tbody>
       </table>
-      <p><a href="https://www.webpay.cl/company/153129?utm_source=transbank&utm_medium=portal3.0&utm_campaign=link_portal">Pagar “aquí” https://www.webpay.cl/company/153129?utm_source=transbank&utm_medium=portal3.0&utm_campaign=link_portal</a></p>
+      <p><a href="https://www.webpay.cl/company/153129?utm_source=transbank&utm_medium=portal3.0&utm_campaign=link_portal">Pagar "aquí" https://www.webpay.cl/company/153129?utm_source=transbank&utm_medium=portal3.0&utm_campaign=link_portal</a></p>
       <h3>Resumen:</h3>
       <p>Monto Compra: $${subtotal.toLocaleString()}</p>
       <p>Monto Envío: $${envio.toLocaleString()}</p>
       <p>Monto Total a Pagar: $${total.toLocaleString()}</p>
 
-      <p>Ante cualquier duda contáctenos al número “xxxxxxx” (símbolo de wassap o teléfono)<br>Atte., Sixbridge SPA</p>
+      <p>Ante cualquier duda contáctenos al número "xxxxxxx" (símbolo de wassap o teléfono)<br>Atte., Sixbridge SPA</p>
     </body>
     </html>
   `;
@@ -121,7 +121,7 @@ module.exports = {
         </tbody>
       </table>
 
-      <p>Ante cualquier duda contáctenos al número “xxxxxxx” (símbolo de wassap o teléfono)<br>Atte., Sixbridge SPA</p>
+      <p>Ante cualquier duda contáctenos al número "xxxxxxx" (símbolo de wassap o teléfono)<br>Atte., Sixbridge SPA</p>
     </body>
     </html>
   `;
@@ -181,9 +181,16 @@ module.exports = {
       <p>Monto Total a Pagar: $${total.toLocaleString()}</p>
       <p>Fecha: ${fechaAprobacion}</p>
 
-      <p>Ante cualquier duda contáctenos al número “xxxxxxx” (símbolo de wassap o teléfono)<br>Atte., Sixbridge SPA</p>
+      <p>Ante cualquier duda contáctenos al número "xxxxxxx" (símbolo de wassap o teléfono)<br>Atte., Sixbridge SPA</p>
     </body>
     </html>
   `;
   },
+  orderApprovedVendor: ({ clientName, numeropedido, productos, total }) => `
+    <h1>Pedido aprobado</h1>
+    <p>Cliente: ${clientName}</p>
+    <p>Número de pedido: ${numeropedido}</p>
+    <p>Productos: ${productos.map(p => `${p.nombre} x${p.cantidad}`).join(", ")}</p>
+    <p>Total: $${total}</p>
+  `,
 };
