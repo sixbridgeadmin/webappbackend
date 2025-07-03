@@ -899,10 +899,6 @@ const resolvers = {
           }
         );
 
-        if (!pedidoPopulado.cliente) {
-          throw new Error("No se encontró el cliente para este pedido (posible inconsistencia en la base de datos)");
-        }
-
         return pedidoPopulado;
       } catch (error) {
         console.error("Error al guardar el pedido:", error);
@@ -1104,10 +1100,6 @@ const resolvers = {
           );
         }
         
-        if (!pedidoPopulado.cliente) {
-          throw new Error("No se encontró el cliente para este pedido (posible inconsistencia en la base de datos)");
-        }
-
         return pedido;
       } catch (error) {
         console.error("Error al actualizar el pedido:", error);
