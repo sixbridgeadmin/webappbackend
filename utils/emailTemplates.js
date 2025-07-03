@@ -186,14 +186,46 @@ module.exports = {
     </html>
   `;
   },
-  orderApprovedVendor: (data = {}) => {
-    const { clientName = '', numeropedido = '', productos = [], total = 0 } = data;
+  orderApprovedVendor: (numeropedido, productos) => {
+    // Crear filas de productos para la tabla
+    const productosHTML = productos
+      .map(
+        (producto) => `
+        <tr>
+          <td>${producto.nombre}</td>
+          <td>${producto.cantidad}</td>
+        </tr>
+      `
+      )
+      .join("");
+
     return `
+    <!DOCTYPE html>
+    <html lang="es">
+    <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>Pedido N° ${numeropedido}</title>
+    </head>
+    <body>
       <h1>Pedido aprobado</h1>
-      <p>Cliente: ${clientName}</p>
-      <p>Número de pedido: ${numeropedido}</p>
-      <p>Productos: ${productos.map(p => `${p.nombre} x${p.cantidad}`).join(", ")}</p>
-      <p>Total: $${total}</p>
-    `;
+      <p>Número pedido : ${numeropedido}<br>
+      etalle:</p>
+      <table>
+        <thead>
+          <tr>
+            <th>Producto</th>
+            <th>Cantidad</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${productosHTML}
+        </tbody>
+      </table>
+
+      <p>Ante cualquier duda contáctenos <br>Atte., Sixbridge SPA</p>
+    </body>
+    </html>
+  `;
   },
 };
