@@ -22,15 +22,90 @@ const sendEmail = async (to, subject, templateName, replacements) => {
     throw new Error(`Plantilla ${templateName} no encontrada`);
   }
 
-  // Generar el HTML con los parámetros NOMBRADOS
-  const html = template(
-    replacements.name, // parámetro 1: nombre
-    replacements.numeropedido, // parámetro 2: número de pedido
-    replacements.productos, // parámetro 3: array de productos
-    replacements.subtotal, // parámetro 4: subtotal
-    replacements.envio, // parámetro 5: costo de envío
-    replacements.total // parámetro 6: total
-  );
+  let html;
+  
+  // Manejar diferentes templates según sus parámetros específicos
+  switch (templateName) {
+    case "welcome":
+      html = template(replacements.name);
+      break;
+    case "newOrder":
+      html = template(
+        replacements.name,
+        replacements.numeropedido,
+        replacements.productos,
+        replacements.subtotal,
+        replacements.envio,
+        replacements.total
+      );
+      break;
+    case "newOrderUs":
+      html = template(
+        replacements.name,
+        replacements.numeropedido,
+        replacements.total
+      );
+      break;
+    case "orderStatusUpdated":
+      html = template(
+        replacements.name,
+        replacements.numeropedido,
+        replacements.productos,
+        replacements.estado
+      );
+      break;
+    case "orderStatusUpdatedObs":
+      html = template(
+        replacements.nombre,
+        replacements.numeropedido,
+        replacements.estado,
+        replacements.productos,
+        replacements.subtotal,
+        replacements.envio,
+        replacements.total,
+        replacements.fechaAprobacion
+      );
+      break;
+    case "orderApprovedVendor":
+      html = template(
+        replacements.numeropedido,
+        replacements.productos
+      );
+      break;
+    case "orderApprovedProvider":
+      html = template(
+        replacements.name,
+        replacements.numeropedido,
+        replacements.productos
+      );
+      break;
+    case "orderStatusUpdatedObsVendor":
+      html = template(
+        replacements.nombre,
+        replacements.numeropedido,
+        replacements.productos,
+        replacements.total
+      );
+      break;
+    case "stockBajo":
+      html = template(
+        replacements.nombreProducto,
+        replacements.existenciaActual,
+        replacements.umbralStockBajo,
+        replacements.fecha
+      );
+      break;
+    default:
+      // Para templates que usan parámetros posicionales genéricos
+      html = template(
+        replacements.name,
+        replacements.numeropedido,
+        replacements.productos,
+        replacements.subtotal,
+        replacements.envio,
+        replacements.total
+      );
+  }
 
   const mailOptions = {
     from: config.email.from,

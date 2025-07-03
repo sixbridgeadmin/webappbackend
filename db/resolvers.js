@@ -1045,26 +1045,39 @@ const resolvers = {
 
         
         if (pedidoPopulado.estado === "Aprobado") {
-          await sendEmail(
-            pedidoPopulado.proveedor.email,
-            "Pedido actualizado",
-            "orderStatusUpdated",
-            {
-              name: pedidoPopulado.proveedor.nombre,
-              numeropedido: pedidoPopulado.numeropedido,
-              estado: pedidoPopulado.estado,
-              productos: productosConInfo,
-            }
-          );
-          await sendEmail(
-            pedidoPopulado.vendedor.email,
-            "Pedido aprobado - Acción requerida",
-            "orderApprovedVendor",
-            {
-              numeropedido: pedidoPopulado.numeropedido,
-              productos: productosConInfo 
-            }
-          );
+          console.log("Enviando email al proveedor:", pedidoPopulado.proveedor.email);
+          console.log("Enviando email al vendedor:", pedidoPopulado.vendedor.email);
+          
+          try {
+            await sendEmail(
+              pedidoPopulado.proveedor.email,
+              "Pedido Aprobado - Preparación Requerida",
+              "orderApprovedProvider",
+              {
+                name: pedidoPopulado.proveedor.nombre,
+                numeropedido: pedidoPopulado.numeropedido,
+                productos: productosConInfo,
+              }
+            );
+            console.log("Email enviado exitosamente al proveedor");
+          } catch (error) {
+            console.error("Error enviando email al proveedor:", error);
+          }
+          
+          try {
+            await sendEmail(
+              pedidoPopulado.vendedor.email,
+              "Pedido aprobado - Acción requerida",
+              "orderApprovedVendor",
+              {
+                numeropedido: pedidoPopulado.numeropedido,
+                productos: productosConInfo 
+              }
+            );
+            console.log("Email enviado exitosamente al vendedor");
+          } catch (error) {
+            console.error("Error enviando email al vendedor:", error);
+          }
         }
         
 
