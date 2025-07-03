@@ -14,14 +14,14 @@
 
 module.exports = {
   email: {
-    host: process.env.EMAIL_HOST || "cp7101.webempresa.eu", // Host de Webempresa
-    port: process.env.EMAIL_PORT || 465, // Puerto seguro SSL
+    host: "cp7101.webempresa.eu", // Host de Webempresa
+    port: 465, // Puerto seguro SSL
     secure: true, // true para puerto 465 (SSL)
     auth: {
-      user: process.env.EMAIL_USER || "contacto@sixbridge.cl", // Tu usuario real
-      pass: process.env.EMAIL_PASSWORD || "Sixbridge2025.", // Tu contraseña real
+      user: "contacto@sixbridge.cl", // Tu usuario real
+      pass: "Sixbridge_2025"
     },
-    from: process.env.EMAIL_FROM || "contacto@sixbridge.cl",
+    from: "contacto@sixbridge.cl",
   },
 };
 
