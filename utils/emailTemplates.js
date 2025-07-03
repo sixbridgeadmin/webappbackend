@@ -186,11 +186,14 @@ module.exports = {
     </html>
   `;
   },
-  orderApprovedVendor: ({ clientName, numeropedido, productos, total }) => `
-    <h1>Pedido aprobado</h1>
-    <p>Cliente: ${clientName}</p>
-    <p>Número de pedido: ${numeropedido}</p>
-    <p>Productos: ${productos.map(p => `${p.nombre} x${p.cantidad}`).join(", ")}</p>
-    <p>Total: $${total}</p>
-  `,
+  orderApprovedVendor: (data = {}) => {
+    const { clientName = '', numeropedido = '', productos = [], total = 0 } = data;
+    return `
+      <h1>Pedido aprobado</h1>
+      <p>Cliente: ${clientName}</p>
+      <p>Número de pedido: ${numeropedido}</p>
+      <p>Productos: ${productos.map(p => `${p.nombre} x${p.cantidad}`).join(", ")}</p>
+      <p>Total: $${total}</p>
+    `;
+  },
 };

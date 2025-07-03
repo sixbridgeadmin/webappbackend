@@ -1061,10 +1061,10 @@ const resolvers = {
             "Pedido aprobado - Acción requerida",
             "orderApprovedVendor",
             {
-              clientName: pedidoPopulado.cliente.nombre,
-              numeropedido: pedidoPopulado.numeropedido,
-              productos: productosConInfo,
-              total: pedidoPopulado.total,
+              clientName: pedidoPopulado.cliente?.nombre || "",
+              numeropedido: pedidoPopulado.numeropedido || "",
+              productos: productosConInfo || [],
+              total: pedidoPopulado.total || 0,
             }
           );
         }
