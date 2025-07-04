@@ -1064,7 +1064,7 @@ const resolvers = {
             console.error("Error enviando email al proveedor:", error);
           }
           
-          try {
+          /*try {
             await sendEmail(
               pedidoPopulado.vendedor.email,
               "Pedido aprobado - Acción requerida",
@@ -1077,7 +1077,7 @@ const resolvers = {
             console.log("Email enviado exitosamente al vendedor");
           } catch (error) {
             console.error("Error enviando email al vendedor:", error);
-          }
+          }*/
         }
         
 
@@ -1098,7 +1098,7 @@ const resolvers = {
               fechaAprobacion: new Date().toLocaleDateString(),
             }
           );
-          await sendEmail(
+          /*await sendEmail(
             pedidoPopulado.vendedor.email,
             "Pedido con observaciones - Acción requerida",
             "orderStatusUpdatedObsVendor",
@@ -1108,7 +1108,7 @@ const resolvers = {
               productos: productosConInfo,
               total: pedidoPopulado.total,
             }
-          );
+          );*/
         }
         
         return pedido;

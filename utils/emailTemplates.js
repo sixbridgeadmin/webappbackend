@@ -318,8 +318,8 @@ module.exports = {
         
         <div class="contact-info">
           <h4>📞 ¿Necesitas ayuda?</h4>
-          <p><strong>WhatsApp:</strong> +56 9 XXXX XXXX</p>
-          <p><strong>Teléfono:</strong> +56 2 XXXX XXXX</p>
+          <p><strong>WhatsApp:</strong> +56 9 4868 5501</p>
+          <p><strong>Teléfono:</strong> +56 9 4868 5501</p>
           <p><strong>Email:</strong> contacto@sixbridge.cl</p>
         </div>
         
@@ -635,8 +635,8 @@ module.exports = {
         
         <div class="contact-info">
           <h4>📞 Información de Contacto</h4>
-          <p><strong>WhatsApp:</strong> +56 9 XXXX XXXX</p>
-          <p><strong>Teléfono:</strong> +56 2 XXXX XXXX</p>
+          <p><strong>WhatsApp:</strong> +56 9 4868 5501</p>
+          <p><strong>Teléfono:</strong> +56 9 4868 5501</p>
           <p><strong>Email:</strong> contacto@sixbridge.cl</p>
           <p><em>Ante cualquier duda o consulta sobre este pedido, no dude en contactarnos.</em></p>
         </div>
@@ -859,8 +859,8 @@ module.exports = {
         
         <div class="contact-info">
           <h4>📞 Información de Contacto</h4>
-          <p><strong>WhatsApp:</strong> +56 9 XXXX XXXX</p>
-          <p><strong>Teléfono:</strong> +56 2 XXXX XXXX</p>
+          <p><strong>WhatsApp:</strong> +56 9 4868 5501</p>
+          <p><strong>Teléfono:</strong> +56 9 4868 5501</p>
           <p><strong>Email:</strong> contacto@sixbridge.cl</p>
           <p><em>Para resolver las observaciones, contacte a nuestro equipo de soporte.</em></p>
         </div>
@@ -1006,8 +1006,8 @@ module.exports = {
         
         <div class="contact-info">
           <h4>📞 Información de Contacto</h4>
-          <p><strong>WhatsApp:</strong> +56 9 XXXX XXXX</p>
-          <p><strong>Teléfono:</strong> +56 2 XXXX XXXX</p>
+          <p><strong>WhatsApp:</strong> +56 9 4868 5501</p>
+          <p><strong>Teléfono:</strong> +56 9 4868 5501</p>
           <p><strong>Email:</strong> contacto@sixbridge.cl</p>
         </div>
         
@@ -1161,8 +1161,8 @@ module.exports = {
         
         <div class="contact-info">
           <h4>📞 Información de Contacto</h4>
-          <p><strong>WhatsApp:</strong> +56 9 XXXX XXXX</p>
-          <p><strong>Teléfono:</strong> +56 2 XXXX XXXX</p>
+          <p><strong>WhatsApp:</strong> +56 9 4868 5501</p>
+          <p><strong>Teléfono:</strong> +56 9 4868 5501</p>
           <p><strong>Email:</strong> contacto@sixbridge.cl</p>
           <p><em>Ante cualquier duda o consulta, no dude en contactarnos.</em></p>
         </div>
@@ -1324,8 +1324,8 @@ module.exports = {
         
         <div class="contact-info">
           <h4>📞 Información de Contacto</h4>
-          <p><strong>WhatsApp:</strong> +56 9 XXXX XXXX</p>
-          <p><strong>Teléfono:</strong> +56 2 XXXX XXXX</p>
+          <p><strong>WhatsApp:</strong> +56 9 4868 5501</p>
+          <p><strong>Teléfono:</strong> +56 9 4868 5501</p>
           <p><strong>Email:</strong> contacto@sixbridge.cl</p>
           <p><em>Para resolver las observaciones, contacte a nuestro equipo de soporte.</em></p>
         </div>
