@@ -1,3 +1,12 @@
+// Cargar variables de entorno al inicio
+require("dotenv").config();
+
+// Debug: Verificar que las variables se cargan
+console.log("DB_MONGO configurado:", !!process.env.DB_MONGO);
+console.log("SECRETA configurado:", !!process.env.SECRETA);
+console.log("EMAIL_SERVICE configurado:", !!process.env.EMAIL_SERVICE);
+console.log("FRONTEND_ORIGIN configurado:", !!process.env.FRONTEND_ORIGIN);
+
 const { ApolloServer } = require("apollo-server-express");
 const mongoose = require("mongoose");
 const express = require("express");
