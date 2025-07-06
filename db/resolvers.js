@@ -552,6 +552,11 @@ const resolvers = {
     },
     autenticarUsuario: async (_, { input }) => {
       const { email, password, recaptchaToken } = input;
+      
+      // Debug: Verificar que las variables de entorno están cargadas
+      console.log("SECRETA configurado:", !!process.env.SECRETA);
+      console.log("RECAPTCHA_SECRET_KEY configurado:", !!process.env.RECAPTCHA_SECRET_KEY);
+      
       // Validar reCAPTCHA
       const recaptchaValido = await verificarRecaptcha(recaptchaToken);
       if (!recaptchaValido) {
