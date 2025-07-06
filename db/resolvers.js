@@ -580,10 +580,7 @@ const resolvers = {
 
       // Return the user and token
       return {
-        user: {
-          id: existeUsuario._id,
-          role: existeUsuario.role,
-        },
+        user: existeUsuario,
         token,
       };
     },

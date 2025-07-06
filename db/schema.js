@@ -103,7 +103,7 @@ const typeDefs = gql`
   }
   type AutenticarResponse {
     token: String!
-    usuario: Usuario!
+    user: Usuario!
   }
 
   type UpsertProductsResponse {
@@ -275,7 +275,7 @@ const typeDefs = gql`
     # Usuarios
     nuevoUsuario(input: UsuarioInput): Usuario
     actualizarUsuario(id: ID!, input: UsuarioInput): Usuario
-    autenticarUsuario(input: AutenticarInput): Token
+    autenticarUsuario(input: AutenticarInput): AutenticarResponse
 
     # Productos
     nuevoProducto(input: ProductoInput): Producto
