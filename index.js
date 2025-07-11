@@ -41,11 +41,14 @@ const PORT = process.env.PORT || 4000;
 // Configuración CORS mejorada
 const corsOptions = {
   origin: function (origin, callback) {
-    // Permitir solicitudes sin origen (como aplicaciones móviles o curl)
     if (!origin) return callback(null, true);
 
+    const isAllowed = FRONTEND_ORIGINS.some((allowedOrigin) =>
+      origin.startsWith(allowedOrigin)
+    );
+
     if (
-      FRONTEND_ORIGINS.includes(origin) ||
+      isAllowed ||
       origin.includes("vercel.app") ||
       origin.includes("localhost")
     ) {
