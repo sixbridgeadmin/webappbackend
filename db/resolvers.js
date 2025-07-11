@@ -556,12 +556,24 @@ const resolvers = {
       // Debug: Verificar que las variables de entorno están cargadas
       console.log("SECRETA configurado:", !!process.env.SECRETA);
       console.log("RECAPTCHA_SECRET_KEY configurado:", !!process.env.RECAPTCHA_SECRET_KEY);
-      
-      // Validar reCAPTCHA
-      const recaptchaValido = await verificarRecaptcha(recaptchaToken);
-      if (!recaptchaValido) {
-        throw new Error("Falló la verificación de reCAPTCHA");
+    
+      // Verificar si debemos saltar reCAPTCHA
+      const skipRecaptcha =
+      process.env.NODE_ENV === "qa" ||
+      process.env.DISABLE_RECAPTCHA_IN_QA === "true";
+
+      if (skipRecaptcha) {
+        console.log("🔔 Saltando verificación de reCAPTCHA en QA");
+      } else {
+        // Validar reCAPTCHA normalmente
+        const recaptchaValido = await verificarRecaptcha(recaptchaToken);
+        console.log("✅ Resultado reCAPTCHA:", recaptchaValido);
+
+        if (!recaptchaValido) {
+          throw new Error("Falló la verificación de reCAPTCHA");
+        }
       }
+
       // si el usuario existe
       const existeUsuario = await Usuario.findOne({ email });
       if (!existeUsuario) {
