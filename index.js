@@ -26,6 +26,8 @@ const FRONTEND_ORIGINS = [
   "https://localhost:3000",
   "http://127.0.0.1:3000",
   "https://127.0.0.1:3000",
+  "https://app.sixbridge.cl",          // tu producción
+  "https://qa.app.sixbridge.cl"   
 ];
 
 // Conectar a la Base de datos
