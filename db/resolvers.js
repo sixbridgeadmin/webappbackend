@@ -1308,7 +1308,7 @@ const resolvers = {
             nombreProducto: producto.nombre,
             existenciaActual: producto.existencia,
             umbralStockBajo: UMBRAL_STOCK_BAJO,
-            fecha: new Date().toLocaleDateString(),
+            fecha: new Date().toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit', year: 'numeric' }).replace(/\//g, '-'),
           });
           
           return {

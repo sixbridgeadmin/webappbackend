@@ -457,7 +457,7 @@ module.exports = {
           </div>
           <div class="detail-row">
             <span>Fecha de Creación:</span>
-            <span>${new Date().toLocaleDateString()}</span>
+            <span>${new Date().toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit', year: 'numeric' }).replace(/\//g, '-')}</span>
           </div>
         </div>
         
@@ -853,7 +853,7 @@ module.exports = {
         
         <div class="date-info">
           <h4>📅 Información de Fecha</h4>
-          <p><strong>Fecha de Aprobación:</strong> ${fechaAprobacion}</p>
+          <p><strong>Fecha de Aprobación:</strong> ${fechaAprobacion.toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit', year: 'numeric' }).replace(/\//g, '-')}</p>
           <p><em>Por favor, revise las observaciones y tome las acciones correspondientes.</em></p>
         </div>
         
