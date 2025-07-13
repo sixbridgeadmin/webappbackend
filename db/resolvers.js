@@ -184,26 +184,28 @@ const resolvers = {
       return producto;
     },
     obtenerClientes: async (_, { limit, offset }, ctx) => {
-      const { usuario } = ctx; // Assuming `usuario` contains the logged-in user's information
+      // Verificar si el usuario está autenticado
+      if (!ctx.usuario) {
+        throw new Error("Usuario no autenticado");
+      }
 
-      // Debugging: Log the user and role
-      //console.log("ctx.usuario", ctx.usuario);
-      //console.log("ctx.usuario.id", ctx.usuario.id);
+      const { usuario } = ctx;
 
       try {
         const query = {};
 
         // Role-based filtering
-        if (usuario?.role === "vendedor") {
+        if (usuario.role === "vendedor") {
           // If the user is a "vendedor", only fetch clients associated with them
-          query.vendedor = usuario.id; // Assuming `vendedor` is a field in the `Cliente` model
+          query.vendedor = usuario.id;
         }
+        // Si es administrador, no se aplica filtro (query queda vacío = todos los clientes)
 
         // Fetch paginated clients
         const clientes = await Cliente.find(query)
-          .skip(offset || 0) // Default offset to 0 if not provided
+          .skip(offset || 0)
           .limit(limit || 10)
-          .populate("vendedor"); // Default limit to 10 if not provided
+          .populate("vendedor");
 
         return clientes;
       } catch (error) {
