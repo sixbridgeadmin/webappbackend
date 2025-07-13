@@ -875,7 +875,7 @@ module.exports = {
     </html>
   `;
   },
-  orderApprovedVendor: (numeropedido, productos) => {
+  orderApprovedClient: (numeropedido, productos) => {
     // Crear filas de productos para la tabla
     const productosHTML = productos
       .map(

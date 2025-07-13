@@ -66,7 +66,7 @@ const sendEmail = async (to, subject, templateName, replacements) => {
         replacements.fechaAprobacion
       );
       break;
-    case "orderApprovedVendor":
+    case "orderApprovedClient":
       html = template(
         replacements.numeropedido,
         replacements.productos

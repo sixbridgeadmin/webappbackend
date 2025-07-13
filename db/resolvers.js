@@ -1053,8 +1053,7 @@ const resolvers = {
         
         if (pedidoPopulado.estado === "Aprobado") {
           console.log("Enviando email al proveedor:", pedidoPopulado.proveedor.email);
-          console.log("Enviando email al vendedor:", pedidoPopulado.vendedor.email);
-          
+          console.log("Enviando email al cliente:", pedidoPopulado.cliente.email);
           try {
             await sendEmail(
               pedidoPopulado.proveedor.email,
@@ -1071,20 +1070,21 @@ const resolvers = {
             console.error("Error enviando email al proveedor:", error);
           }
           
-          /*try {
+          try {
             await sendEmail(
-              pedidoPopulado.vendedor.email,
-              "Pedido aprobado - Acción requerida",
-              "orderApprovedVendor",
+              pedidoPopulado.cliente.email,
+              "Pedido Aprobado",
+              "orderApprovedClient",
               {
+                name: pedidoPopulado.cliente.nombre,
                 numeropedido: pedidoPopulado.numeropedido,
-                productos: productosConInfo 
+                productos: productosConInfo,
               }
             );
-            console.log("Email enviado exitosamente al vendedor");
+            console.log("Email enviado exitosamente al cliente");
           } catch (error) {
-            console.error("Error enviando email al vendedor:", error);
-          }*/
+            console.error("Error enviando email al cliente:", error);
+          }
         }
         
 
