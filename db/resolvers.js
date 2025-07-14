@@ -879,50 +879,54 @@ const resolvers = {
           })
         );
 
-        
-        await sendEmail(
-          pedidoPopulado.cliente.email,
-          "Nuevo Pedido",
-          "newOrder",
-          {
-            name: pedidoPopulado.cliente.nombre,
-            numeropedido: pedidoPopulado.numeropedido,
-            productos: productosConInfo,
-            subtotal: pedidoPopulado.subtotal,
-            envio: pedidoPopulado.envio,
-            total: pedidoPopulado.total,
-          }
-        );
+        try {
+          await sendEmail(
+            pedidoPopulado.cliente.email,
+            "Nuevo Pedido",
+            "newOrder",
+            {
+              name: pedidoPopulado.cliente.nombre,
+              numeropedido: pedidoPopulado.numeropedido,
+              productos: productosConInfo,
+              subtotal: pedidoPopulado.subtotal,
+              envio: pedidoPopulado.envio,
+              total: pedidoPopulado.total,
+            }
+          );
 
-        await sendEmail(
-          pedidoPopulado.vendedor.email,
-          "Nuevo Pedido",
-          "newOrder",
-          {
-            name: pedidoPopulado.cliente.nombre,
-            numeropedido: pedidoPopulado.numeropedido,
-            productos: productosConInfo,
-            subtotal: pedidoPopulado.subtotal,
-            envio: pedidoPopulado.envio,
-            total: pedidoPopulado.total,
-          }
-        );
+          await sendEmail(
+            pedidoPopulado.vendedor.email,
+            "Nuevo Pedido",
+            "newOrder",
+            {
+              name: pedidoPopulado.cliente.nombre,
+              numeropedido: pedidoPopulado.numeropedido,
+              productos: productosConInfo,
+              subtotal: pedidoPopulado.subtotal,
+              envio: pedidoPopulado.envio,
+              total: pedidoPopulado.total,
+            }
+          );
 
-        await sendEmail(
-          "ventas@sixbridge.cl",
-          "Nuevo Pedido",
-          "newOrder",
-          {
-            name: pedidoPopulado.cliente.nombre,
-            numeropedido: pedidoPopulado.numeropedido,
-            productos: productosConInfo,
-            subtotal: pedidoPopulado.subtotal,
-            envio: pedidoPopulado.envio,
-            total: pedidoPopulado.total,
-          }
-        );
-
+          await sendEmail(
+            "ventas@sixbridge.cl",
+            "Nuevo Pedido",
+            "newOrder",
+            {
+              name: pedidoPopulado.cliente.nombre,
+              numeropedido: pedidoPopulado.numeropedido,
+              productos: productosConInfo,
+              subtotal: pedidoPopulado.subtotal,
+              envio: pedidoPopulado.envio,
+              total: pedidoPopulado.total,
+            }
+          );
+        }catch(error){
+          console.error("Error al enviar el correo:", error);
+          throw new Error("No se pudo enviar el correo");
+        }
         return pedidoPopulado;
+        
       } catch (error) {
         console.error("Error al guardar el pedido:", error);
         throw new Error("No se pudo guardar el pedido");
