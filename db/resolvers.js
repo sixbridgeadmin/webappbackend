@@ -893,10 +893,24 @@ const resolvers = {
             total: pedidoPopulado.total,
           }
         );
+
         await sendEmail(
           pedidoPopulado.vendedor.email,
           "Nuevo Pedido",
-          "newOrderUs",
+          "newOrder",
+          {
+            name: pedidoPopulado.cliente.nombre,
+            numeropedido: pedidoPopulado.numeropedido,
+            subtotal: pedidoPopulado.subtotal,
+            envio: pedidoPopulado.envio,
+            total: pedidoPopulado.total,
+          }
+        );
+
+        await sendEmail(
+          "ventas@sixbridge.cl",
+          "Nuevo Pedido",
+          "newOrder",
           {
             name: pedidoPopulado.cliente.nombre,
             numeropedido: pedidoPopulado.numeropedido,
@@ -1052,9 +1066,10 @@ const resolvers = {
 
         
         if (pedidoPopulado.estado === "Aprobado") {
-          console.log("Enviando email al proveedor:", pedidoPopulado.proveedor.email);
+          //console.log("Enviando email al proveedor:", pedidoPopulado.proveedor.email);
           console.log("Enviando email al cliente:", pedidoPopulado.cliente.email);
-          try {
+
+          /*try {
             await sendEmail(
               pedidoPopulado.proveedor.email,
               "Pedido Aprobado - Preparación Requerida",
@@ -1068,7 +1083,7 @@ const resolvers = {
             console.log("Email enviado exitosamente al proveedor");
           } catch (error) {
             console.error("Error enviando email al proveedor:", error);
-          }
+          }*/
           
           try {
             await sendEmail(
