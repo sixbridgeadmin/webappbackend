@@ -901,6 +901,7 @@ const resolvers = {
           {
             name: pedidoPopulado.cliente.nombre,
             numeropedido: pedidoPopulado.numeropedido,
+            productos: productosConInfo,
             subtotal: pedidoPopulado.subtotal,
             envio: pedidoPopulado.envio,
             total: pedidoPopulado.total,
@@ -914,6 +915,7 @@ const resolvers = {
           {
             name: pedidoPopulado.cliente.nombre,
             numeropedido: pedidoPopulado.numeropedido,
+            productos: productosConInfo,
             subtotal: pedidoPopulado.subtotal,
             envio: pedidoPopulado.envio,
             total: pedidoPopulado.total,
