@@ -59,3 +59,8 @@ jspm_packages/
 .Trashes
 ehthumbs.db
 Thumbs.db
+
+# Ignorar todas las imágenes dentro de public/productos/*
+public/productos/*/*.jpg
+public/productos/*/*.png
+public/productos/*/*.jpeg
