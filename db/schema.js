@@ -46,6 +46,7 @@ const typeDefs = gql`
   descripcion: String
   estado: Boolean!
   creado: String
+  imagen: String  # Nueva línea
 }
   type Cliente {
     id: ID!
