@@ -60,7 +60,7 @@ jspm_packages/
 ehthumbs.db
 Thumbs.db
 
-# Ignorar todas las imágenes dentro de public/productos/*
-public/productos/*/*.jpg
-public/productos/*/*.png
-public/productos/*/*.jpeg
+# Comentar o eliminar estas líneas:
+# public/productos/*/*.jpg
+# public/productos/*/*.png
+# public/productos/*/*.jpeg
