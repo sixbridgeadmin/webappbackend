@@ -35,17 +35,18 @@ const typeDefs = gql`
     pagadoPor: String!
   }
   type Producto {
-    id: ID!
-    nombre: String
-    existencia: Int
-    precio: Float
-    costo: Float
-    skuproveedor: String
-    skuproducto: String
-    sku: String
-    descripcion: String
-    creado: String
-  }
+  id: ID!
+  nombre: String
+  existencia: Int
+  precio: Float
+  costo: Float
+  skuproveedor: String
+  skuproducto: String
+  sku: String
+  descripcion: String
+  estado: Boolean!
+  creado: String
+}
   type Cliente {
     id: ID!
     nombre: String
@@ -167,13 +168,13 @@ const typeDefs = gql`
   input ProductoInput {
     nombre: String!
     existencia: Int!
-    precio: Float!
-    costo: Float!
+    precio: Int!
+    costo: Int!
     skuproveedor: String!
-    skuproducto: String!
-    sku: String
     descripcion: String
+    estado: Boolean
   }
+
   input ClienteInput {
     nombre: String!
     email: String!
@@ -256,6 +257,7 @@ const typeDefs = gql`
     ): [Pedido]
     totalPedidosVendedor(estado: String): Int
     obtenerPedidosEntregados(vendedorId: ID!): [Pedido]
+    cambiarEstadoProducto(id: ID!): Producto
 
     # Busquedas avanzadas
     buscarProducto(texto: String!): [Producto]
@@ -283,6 +285,7 @@ const typeDefs = gql`
     eliminarProducto(id: ID!): String
     insertProducts(productos: [ProductoInput!]!): [Producto!]!
     upsertProducts(productos: [ProductoInput!]!): UpsertProductsResponse!
+    cambiarEstadoProducto(id: ID!): Producto
 
     # Clientes
     nuevoCliente(input: ClienteInput): Cliente

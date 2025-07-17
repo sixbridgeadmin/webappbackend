@@ -10,6 +10,7 @@ const productoSchema = mongoose.Schema({
   skuproducto: { type: String, required: true },
   sku: { type: String, required: true, unique: true },
   descripcion: { type: String },
+  estado: { type: Boolean, default: true },
 });
 // Hook 'pre-save' para generar el SKU antes de guardar el documento
 productoSchema.pre("save", function (next) {

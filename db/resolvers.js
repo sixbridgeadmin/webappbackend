@@ -13,6 +13,25 @@ const calculateDeliveryCost = require("../utils/calcularCostoEnvio");
 require("dotenv").config({ path: "variables.env" });
 const { ObjectId } = require("mongodb"); // Importar ObjectId desde mongodb
 const { GraphQLError } = require("graphql");
+const ContadorProveedor = require("../models/ContadorProveedor");
+
+async function obtenerNuevoSkuproducto(skuproveedor) {
+  const resultado = await ContadorProveedor.findOneAndUpdate(
+    { _id: skuproveedor },
+    { $inc: { contador: 1 } },
+    { new: true, upsert: true }
+  );
+
+  // Formato con al menos 4 dígitos, se agranda automáticamente si el número es mayor
+  const contador = resultado.contador.toString();
+  const largoDeseado = Math.max(4, contador.length);
+
+  const skuproducto = contador.padStart(largoDeseado, '0');
+
+  return skuproducto;
+}
+
+
 
 const crearToken = (usuario, secreta, expiresIn) => {
   console.log("usuario:", usuario);
@@ -504,7 +523,7 @@ const resolvers = {
       const existeUsuario = await Usuario.findOne({ email });
       if (existeUsuario) {
         throw new Error("El usuario ya está registrado");
-      }
+      }      
 
       // hashear su password
       const salt = await bcryptjs.genSalt(10);
@@ -552,6 +571,17 @@ const resolvers = {
         throw new Error("No se pudo actualizar el usuario");
       }
     },
+    cambiarEstadoProducto: async (_, { id }) => {
+  const producto = await Producto.findById(id);
+  if (!producto) {
+    throw new Error("Producto no encontrado");
+  }
+
+  producto.estado = !producto.estado;
+  await producto.save();
+
+  return producto;
+},
     autenticarUsuario: async (_, { input }) => {
       const { email, password, recaptchaToken } = input;
       
@@ -595,15 +625,34 @@ const resolvers = {
       };
     },
     nuevoProducto: async (_, { input }) => {
-      try {
-        const producto = new Producto(input);
-        await producto.save();
-        return producto;
-      } catch (error) {
-        console.error("Error creating producto:", error);
-        throw new Error("Error creating producto");
-      }
-    },
+  try {
+    // Eliminar campos que no se deben incluir en el objeto de entrada
+    const { skuproveedor, ...restoInput } = input;
+    const nuevoContador = await obtenerNuevoSkuproducto(skuproveedor);    
+    const skuproducto = nuevoContador.toString();
+    const sku = `${skuproveedor}${skuproducto}`;
+
+    // Verificar si el producto ya existe
+    const existe = await Producto.findOne({ skuproveedor, skuproducto });
+    if (existe) {
+      throw new Error(`Ya existe un producto con skuproveedor: ${skuproveedor} y skuproducto: ${skuproducto}`);
+    }
+    
+    const producto = new Producto({
+      ...restoInput,
+      skuproveedor,
+      skuproducto,
+      sku,
+    });
+
+    await producto.save();
+    return producto;
+  } catch (error) {
+    console.error("Error creating producto:", error);
+    throw new Error("Error creating producto");
+  }
+},
+
     actualizarProducto: async (_, { id, input }) => {
       try {
         const producto = await Producto.findByIdAndUpdate(id, input, {
