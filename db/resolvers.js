@@ -147,12 +147,6 @@ async function verificarRecaptcha(token) {
 
 // Resolvers
 const resolvers = {
-  Producto: {
-    imagen: (producto) => {
-      const HOST = process.env.RENDER_EXTERNAL_URL || `http://localhost:4000`;
-      return `${HOST}/productos/${producto.skuproveedor}/${producto.sku}.jpg`;
-    }
-  },
   Query: {
     obtenerUsuario: async (_, {}, ctx) => {
       console.log("Contexto recibido:", ctx.usuario); // Verifica el contexto
@@ -195,6 +189,7 @@ const resolvers = {
     obtenerProductos: async () => {
       try {
         const productos = await Producto.find({});
+        console.log("productos", productos);
         return productos;
       } catch (error) {
         console.log(error);
@@ -461,6 +456,7 @@ const resolvers = {
     obtenerProductosProveedor: async (_, { skuproveedor }) => {
       try {
         const productos = await Producto.find({ skuproveedor: skuproveedor });
+        console.log("productos", productos);
         return productos;
       } catch (error) {
         console.log(error);
