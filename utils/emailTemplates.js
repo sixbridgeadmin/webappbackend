@@ -986,7 +986,7 @@ module.exports = {
         
         <div class="order-number">
           <h2>✅ Pedido Aprobado - N° ${numeropedido}</h2>
-          <p>Su pedido ha sido <span class="status-badge">APROBADO</span> y está siendo procesado.</p>
+          <p>Estimado ${name} su pedido ha sido <span class="status-badge">APROBADO</span> y está siendo procesado.</p>
         </div>
         
         <h3>📋 Detalle del Pedido:</h3>
