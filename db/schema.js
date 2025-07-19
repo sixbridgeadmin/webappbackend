@@ -174,6 +174,7 @@ const typeDefs = gql`
     skuproveedor: String!
     descripcion: String
     estado: Boolean
+  imagen: String
   }
 
   input ClienteInput {
