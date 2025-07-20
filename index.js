@@ -26,6 +26,8 @@ const FRONTEND_ORIGINS = [
   "https://localhost:3000",
   "http://127.0.0.1:3000",
   "https://127.0.0.1:3000",
+  "https://app.sixbridge.cl",          // tu producción
+  "https://qa.app.sixbridge.cl"   
 ];
 
 // Conectar a la Base de datos
@@ -34,16 +36,38 @@ conectarDB();
 // Initialize Express app
 const app = express();
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+const multer = require("multer");
+const path = require("path");
+const fs = require("fs");
+app.use("/productos", express.static(path.join(__dirname, "public", "productos")));
+
+// Configuración de multer para guardar imágenes en public/productos
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    const tempDir = path.join(__dirname, "public", "productos", "temp");
+    fs.mkdirSync(tempDir, { recursive: true });
+    cb(null, tempDir);
+  },
+  filename: (req, file, cb) => {
+    cb(null, Date.now() + path.extname(file.originalname));
+  },
+});
+const upload = multer({ storage });
+
 const PORT = process.env.PORT || 4000;
 
 // Configuración CORS mejorada
 const corsOptions = {
   origin: function (origin, callback) {
-    // Permitir solicitudes sin origen (como aplicaciones móviles o curl)
     if (!origin) return callback(null, true);
 
+    const isAllowed = FRONTEND_ORIGINS.some((allowedOrigin) =>
+      origin.startsWith(allowedOrigin)
+    );
+
     if (
-      FRONTEND_ORIGINS.includes(origin) ||
+      isAllowed ||
       origin.includes("vercel.app") ||
       origin.includes("localhost")
     ) {
@@ -86,6 +110,26 @@ const authenticate = (req, res, next) => {
     return res.status(401).json({ message: "Invalid token" });
   }
 };
+
+// Ruta para obtener imagen los pedidos
+app.post("/api/upload-producto/:skuproveedor/:sku", upload.single("file"), (req, res) => {
+  const { skuproveedor, sku } = req.params;
+  if (!req.file) {
+    return res.status(400).json({ message: "Archivo no recibido" });
+  }
+
+  const targetDir = path.join(__dirname, "public", "productos", skuproveedor);
+  fs.mkdirSync(targetDir, { recursive: true });
+
+  const newPath = path.join(targetDir, `${sku}.jpg`);
+  fs.rename(req.file.path, newPath, (err) => {
+    if (err) {
+      console.error("Error al mover el archivo:", err);
+      return res.status(500).json({ message: "Error al guardar imagen" });
+    }
+    res.json({ message: "Imagen subida correctamente" });
+  });
+});
 
 // Initialize Apollo Server with improved configuration
 const server = new ApolloServer({

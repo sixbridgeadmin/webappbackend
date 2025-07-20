@@ -13,6 +13,25 @@ const calculateDeliveryCost = require("../utils/calcularCostoEnvio");
 require("dotenv").config({ path: "variables.env" });
 const { ObjectId } = require("mongodb"); // Importar ObjectId desde mongodb
 const { GraphQLError } = require("graphql");
+const ContadorProveedor = require("../models/ContadorProveedor");
+
+async function obtenerNuevoSkuproducto(skuproveedor) {
+  const resultado = await ContadorProveedor.findOneAndUpdate(
+    { _id: skuproveedor },
+    { $inc: { contador: 1 } },
+    { new: true, upsert: true }
+  );
+
+  // Formato con al menos 4 dígitos, se agranda automáticamente si el número es mayor
+  const contador = resultado.contador.toString();
+  const largoDeseado = Math.max(4, contador.length);
+
+  const skuproducto = contador.padStart(largoDeseado, '0');
+
+  return skuproducto;
+}
+
+
 
 const crearToken = (usuario, secreta, expiresIn) => {
   console.log("usuario:", usuario);
@@ -170,6 +189,7 @@ const resolvers = {
     obtenerProductos: async () => {
       try {
         const productos = await Producto.find({});
+        console.log("productos", productos);
         return productos;
       } catch (error) {
         console.log(error);
@@ -184,26 +204,28 @@ const resolvers = {
       return producto;
     },
     obtenerClientes: async (_, { limit, offset }, ctx) => {
-      const { usuario } = ctx; // Assuming `usuario` contains the logged-in user's information
+      // Verificar si el usuario está autenticado
+      if (!ctx.usuario) {
+        throw new Error("Usuario no autenticado");
+      }
 
-      // Debugging: Log the user and role
-      //console.log("ctx.usuario", ctx.usuario);
-      //console.log("ctx.usuario.id", ctx.usuario.id);
+      const { usuario } = ctx;
 
       try {
         const query = {};
 
         // Role-based filtering
-        if (usuario?.role === "vendedor") {
+        if (usuario.role === "vendedor") {
           // If the user is a "vendedor", only fetch clients associated with them
-          query.vendedor = usuario.id; // Assuming `vendedor` is a field in the `Cliente` model
+          query.vendedor = usuario.id;
         }
+        // Si es administrador, no se aplica filtro (query queda vacío = todos los clientes)
 
         // Fetch paginated clients
         const clientes = await Cliente.find(query)
-          .skip(offset || 0) // Default offset to 0 if not provided
+          .skip(offset || 0)
           .limit(limit || 10)
-          .populate("vendedor"); // Default limit to 10 if not provided
+          .populate("vendedor");
 
         return clientes;
       } catch (error) {
@@ -434,6 +456,7 @@ const resolvers = {
     obtenerProductosProveedor: async (_, { skuproveedor }) => {
       try {
         const productos = await Producto.find({ skuproveedor: skuproveedor });
+        console.log("productos", productos);
         return productos;
       } catch (error) {
         console.log(error);
@@ -502,7 +525,7 @@ const resolvers = {
       const existeUsuario = await Usuario.findOne({ email });
       if (existeUsuario) {
         throw new Error("El usuario ya está registrado");
-      }
+      }      
 
       // hashear su password
       const salt = await bcryptjs.genSalt(10);
@@ -550,18 +573,32 @@ const resolvers = {
         throw new Error("No se pudo actualizar el usuario");
       }
     },
+    cambiarEstadoProducto: async (_, { id }) => {
+  const producto = await Producto.findById(id);
+  if (!producto) {
+    throw new Error("Producto no encontrado");
+  }
+
+  producto.estado = !producto.estado;
+  await producto.save();
+
+  return producto;
+},
     autenticarUsuario: async (_, { input }) => {
       const { email, password, recaptchaToken } = input;
       
       // Debug: Verificar que las variables de entorno están cargadas
       console.log("SECRETA configurado:", !!process.env.SECRETA);
       console.log("RECAPTCHA_SECRET_KEY configurado:", !!process.env.RECAPTCHA_SECRET_KEY);
-      
-      // Validar reCAPTCHA
+    
+      // Validar reCAPTCHA normalmente
       const recaptchaValido = await verificarRecaptcha(recaptchaToken);
+      
       if (!recaptchaValido) {
         throw new Error("Falló la verificación de reCAPTCHA");
       }
+
+
       // si el usuario existe
       const existeUsuario = await Usuario.findOne({ email });
       if (!existeUsuario) {
@@ -590,15 +627,34 @@ const resolvers = {
       };
     },
     nuevoProducto: async (_, { input }) => {
-      try {
-        const producto = new Producto(input);
-        await producto.save();
-        return producto;
-      } catch (error) {
-        console.error("Error creating producto:", error);
-        throw new Error("Error creating producto");
-      }
-    },
+  try {
+    // Eliminar campos que no se deben incluir en el objeto de entrada
+    const { skuproveedor, ...restoInput } = input;
+    const nuevoContador = await obtenerNuevoSkuproducto(skuproveedor);    
+    const skuproducto = nuevoContador.toString();
+    const sku = `${skuproveedor}${skuproducto}`;
+
+    // Verificar si el producto ya existe
+    const existe = await Producto.findOne({ skuproveedor, skuproducto });
+    if (existe) {
+      throw new Error(`Ya existe un producto con skuproveedor: ${skuproveedor} y skuproducto: ${skuproducto}`);
+    }
+    
+    const producto = new Producto({
+      ...restoInput,
+      skuproveedor,
+      skuproducto,
+      sku,
+    });
+
+    await producto.save();
+    return producto;
+  } catch (error) {
+    console.error("Error creating producto:", error);
+    throw new Error("Error creating producto");
+  }
+},
+
     actualizarProducto: async (_, { id, input }) => {
       try {
         const producto = await Producto.findByIdAndUpdate(id, input, {
@@ -874,34 +930,54 @@ const resolvers = {
           })
         );
 
-        
-        await sendEmail(
-          pedidoPopulado.cliente.email,
-          "Nuevo Pedido",
-          "newOrder",
-          {
-            name: pedidoPopulado.cliente.nombre,
-            numeropedido: pedidoPopulado.numeropedido,
-            productos: productosConInfo,
-            subtotal: pedidoPopulado.subtotal,
-            envio: pedidoPopulado.envio,
-            total: pedidoPopulado.total,
-          }
-        );
-        await sendEmail(
-          pedidoPopulado.vendedor.email,
-          "Nuevo Pedido",
-          "newOrderUs",
-          {
-            name: pedidoPopulado.cliente.nombre,
-            numeropedido: pedidoPopulado.numeropedido,
-            subtotal: pedidoPopulado.subtotal,
-            envio: pedidoPopulado.envio,
-            total: pedidoPopulado.total,
-          }
-        );
+        try {
+          await sendEmail(
+            pedidoPopulado.cliente.email,
+            "Nuevo Pedido",
+            "newOrder",
+            {
+              name: pedidoPopulado.cliente.nombre,
+              numeropedido: pedidoPopulado.numeropedido,
+              productos: productosConInfo,
+              subtotal: pedidoPopulado.subtotal,
+              envio: pedidoPopulado.envio,
+              total: pedidoPopulado.total,
+            }
+          );
 
+          await sendEmail(
+            pedidoPopulado.vendedor.email,
+            "Nuevo Pedido",
+            "newOrder",
+            {
+              name: pedidoPopulado.cliente.nombre,
+              numeropedido: pedidoPopulado.numeropedido,
+              productos: productosConInfo,
+              subtotal: pedidoPopulado.subtotal,
+              envio: pedidoPopulado.envio,
+              total: pedidoPopulado.total,
+            }
+          );
+
+          await sendEmail(
+            "ventas@sixbridge.cl",
+            "Nuevo Pedido",
+            "newOrder",
+            {
+              name: pedidoPopulado.cliente.nombre,
+              numeropedido: pedidoPopulado.numeropedido,
+              productos: productosConInfo,
+              subtotal: pedidoPopulado.subtotal,
+              envio: pedidoPopulado.envio,
+              total: pedidoPopulado.total,
+            }
+          );
+        }catch(error){
+          console.error("Error al enviar el correo:", error);
+          throw new Error("No se pudo enviar el correo");
+        }
         return pedidoPopulado;
+        
       } catch (error) {
         console.error("Error al guardar el pedido:", error);
         throw new Error("No se pudo guardar el pedido");
@@ -1047,10 +1123,10 @@ const resolvers = {
 
         
         if (pedidoPopulado.estado === "Aprobado") {
-          console.log("Enviando email al proveedor:", pedidoPopulado.proveedor.email);
-          console.log("Enviando email al vendedor:", pedidoPopulado.vendedor.email);
-          
-          try {
+          //console.log("Enviando email al proveedor:", pedidoPopulado.proveedor.email);
+          console.log("Enviando email al cliente:", pedidoPopulado.cliente.email);
+
+          /*try {
             await sendEmail(
               pedidoPopulado.proveedor.email,
               "Pedido Aprobado - Preparación Requerida",
@@ -1064,22 +1140,23 @@ const resolvers = {
             console.log("Email enviado exitosamente al proveedor");
           } catch (error) {
             console.error("Error enviando email al proveedor:", error);
-          }
+          }*/
           
-          /*try {
+          try {
             await sendEmail(
-              pedidoPopulado.vendedor.email,
-              "Pedido aprobado - Acción requerida",
-              "orderApprovedVendor",
+              pedidoPopulado.cliente.email,
+              "Pedido Aprobado",
+              "orderApprovedClient",
               {
+                name: pedidoPopulado.cliente.nombre,
                 numeropedido: pedidoPopulado.numeropedido,
-                productos: productosConInfo 
+                productos: productosConInfo,
               }
             );
-            console.log("Email enviado exitosamente al vendedor");
+            console.log("Email enviado exitosamente al cliente");
           } catch (error) {
-            console.error("Error enviando email al vendedor:", error);
-          }*/
+            console.error("Error enviando email al cliente:", error);
+          }
         }
         
 
@@ -1305,7 +1382,7 @@ const resolvers = {
             nombreProducto: producto.nombre,
             existenciaActual: producto.existencia,
             umbralStockBajo: UMBRAL_STOCK_BAJO,
-            fecha: new Date().toLocaleDateString(),
+            fecha: new Date().toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit', year: 'numeric' }).replace(/\//g, '-'),
           });
           
           return {

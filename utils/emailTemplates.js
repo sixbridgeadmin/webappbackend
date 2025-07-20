@@ -457,7 +457,7 @@ module.exports = {
           </div>
           <div class="detail-row">
             <span>Fecha de Creación:</span>
-            <span>${new Date().toLocaleDateString()}</span>
+            <span>${new Date().toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit', year: 'numeric' }).replace(/\//g, '-')}</span>
           </div>
         </div>
         
@@ -853,7 +853,7 @@ module.exports = {
         
         <div class="date-info">
           <h4>📅 Información de Fecha</h4>
-          <p><strong>Fecha de Aprobación:</strong> ${fechaAprobacion}</p>
+          <p><strong>Fecha de Aprobación:</strong> ${fechaAprobacion.toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit', year: 'numeric' }).replace(/\//g, '-')}</p>
           <p><em>Por favor, revise las observaciones y tome las acciones correspondientes.</em></p>
         </div>
         
@@ -875,7 +875,7 @@ module.exports = {
     </html>
   `;
   },
-  orderApprovedVendor: (numeropedido, productos) => {
+  orderApprovedClient: (name, numeropedido, productos) => {
     // Crear filas de productos para la tabla
     const productosHTML = productos
       .map(
@@ -986,7 +986,7 @@ module.exports = {
         
         <div class="order-number">
           <h2>✅ Pedido Aprobado - N° ${numeropedido}</h2>
-          <p>Su pedido ha sido <span class="status-badge">APROBADO</span> y está siendo procesado.</p>
+          <p>Estimado ${name} su pedido ha sido <span class="status-badge">APROBADO</span> y está siendo procesado.</p>
         </div>
         
         <h3>📋 Detalle del Pedido:</h3>

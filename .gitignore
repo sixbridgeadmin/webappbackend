@@ -59,3 +59,8 @@ jspm_packages/
 .Trashes
 ehthumbs.db
 Thumbs.db
+
+# Comentar o eliminar estas líneas:
+# public/productos/*/*.jpg
+# public/productos/*/*.png
+# public/productos/*/*.jpeg
