@@ -172,9 +172,10 @@ const typeDefs = gql`
     precio: Int!
     costo: Int!
     skuproveedor: String!
+    skuproducto: String
     descripcion: String
     estado: Boolean
-  imagen: String
+    imagen: String
   }
 
   input ClienteInput {
