@@ -1021,12 +1021,9 @@ const resolvers = {
         }
 
         // Update productos if provided
-        if (productosInput && productosInput.length > 0) {
-          for (const {
-            id: productoId,
-            cantidad: nuevaCantidad,
-          } of productosInput) {
-            if (!productoId || nuevaCantidad === undefined) {
+        if (Array.isArray(productosInput)) {
+          for (const { id: productoId, cantidad: nuevaCantidad } of productosInput) {
+            if (!productoId || typeof nuevaCantidad !== "number") {
               console.warn(`Producto con ID ${productoId} o cantidad inválida`);
               continue;
             }
@@ -1037,47 +1034,45 @@ const resolvers = {
               continue;
             }
 
-            // Find the product in the pedido array
-            const productoEnPedido = pedido.pedido.find(
-              (p) => p.id.toString() === productoId
+            const existente = pedido.pedido.find(
+              (p) => String(p.id) === String(productoId)
             );
-            if (!productoEnPedido) {
-              console.warn(
-                `Producto con ID ${productoId} no está en el pedido`
-              );
-              continue;
-            }
 
-            // Update cantidad in the pedido array
-            productoEnPedido.cantidad = nuevaCantidad;
+            if (existente) {
+              // Actualizar cantidad
+              existente.cantidad = nuevaCantidad;
+            } else {
+              // Agregar nueva línea al pedido
+              pedido.pedido.push({
+                id: producto._id, // si tu schema usa string, podrías usar: id: productoId
+                cantidad: nuevaCantidad,
+              });
+            }
           }
 
           // Mark the pedido.pedido array as modified
           pedido.markModified("pedido");
         }
 
-        // Replace notas if provided
-        if (notas && notas.length > 0) {
-          pedido.notas = notas; // Replace the existing notas with the new ones
+        // Reemplazar notas (incluye permitir [] para limpiar)
+        if (Array.isArray(notas)) {
+          pedido.notas = notas;
           pedido.markModified("notas");
         }
 
-        // Use the envio value from the input
-        pedido.envio = envioInput;
+        // Actualizar envío si viene definido
+        if (typeof envioInput === "number") {
+          pedido.envio = envioInput;
+        }
 
         // Recalculate subtotal based on the updated pedido array
         let subtotal = 0;
-        for (const producto of pedido.pedido) {
-          const productoDetalle = await Producto.findById(producto.id);
-          subtotal += (productoDetalle?.precio || 0) * producto.cantidad;
+        for (const item of pedido.pedido) {
+          const productoDetalle = await Producto.findById(item.id);
+          subtotal += (productoDetalle?.precio || 0) * item.cantidad;
         }
-
-        // Recalculate total
-        const total = subtotal + pedido.envio;
-
-        // Update subtotal and total
         pedido.subtotal = subtotal;
-        pedido.total = total;
+        pedido.total = subtotal + (Number(pedido.envio) || 0);
 
         console.log("Updated Pedido:", pedido); // Log the updated pedido
 
