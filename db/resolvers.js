@@ -1022,10 +1022,18 @@ const resolvers = {
 
         // Update productos if provided
         if (Array.isArray(productosInput)) {
+          // Sincroniza completamente el arreglo con lo recibido:
+          // - Si un producto no viene en productosInput, se elimina.
+          // - Si cantidad <= 0, se elimina.
+          // - Solo se agregan productos válidos existentes.
+          const nuevasLineas = [];
           for (const { id: productoId, cantidad: nuevaCantidad } of productosInput) {
             if (!productoId || typeof nuevaCantidad !== "number") {
               console.warn(`Producto con ID ${productoId} o cantidad inválida`);
               continue;
+            }
+            if (nuevaCantidad <= 0) {
+              continue; // tratar como eliminación
             }
 
             const producto = await Producto.findById(productoId);
@@ -1034,22 +1042,14 @@ const resolvers = {
               continue;
             }
 
-            const existente = pedido.pedido.find(
-              (p) => String(p.id) === String(productoId)
-            );
-
-            if (existente) {
-              // Actualizar cantidad
-              existente.cantidad = nuevaCantidad;
-            } else {
-              // Agregar nueva línea al pedido
-              pedido.pedido.push({
-                id: producto._id, // si tu schema usa string, podrías usar: id: productoId
-                cantidad: nuevaCantidad,
-              });
-            }
+            nuevasLineas.push({
+              id: producto._id,
+              cantidad: nuevaCantidad,
+            });
           }
 
+          // Reemplaza completamente el detalle del pedido
+          pedido.pedido = nuevasLineas;
           // Mark the pedido.pedido array as modified
           pedido.markModified("pedido");
         }
@@ -1098,10 +1098,7 @@ const resolvers = {
         console.log("Numero pedido:", pedidoPopulado.numeropedido);
         console.log("Proveedor email:", pedidoPopulado.proveedor.email);
 
-        console.log(
-          "Datos completos del pedido:",
-          JSON.stringify(pedidoPopulado, null, 2)
-        );
+        console.log("Datos completos del pedido:", JSON.stringify(pedidoPopulado, null, 2));
 
         // En tu resolver (nuevoPedido), justo antes del sendEmail:
         const productosConInfo = await Promise.all(
@@ -1116,27 +1113,7 @@ const resolvers = {
           })
         );
 
-        
-        if (pedidoPopulado.estado === "Aprobado") {
-          //console.log("Enviando email al proveedor:", pedidoPopulado.proveedor.email);
-          console.log("Enviando email al cliente:", pedidoPopulado.cliente.email);
-
-          /*try {
-            await sendEmail(
-              pedidoPopulado.proveedor.email,
-              "Pedido Aprobado - Preparación Requerida",
-              "orderApprovedProvider",
-              {
-                name: pedidoPopulado.proveedor.nombre,
-                numeropedido: pedidoPopulado.numeropedido,
-                productos: productosConInfo,
-              }
-            );
-            console.log("Email enviado exitosamente al proveedor");
-          } catch (error) {
-            console.error("Error enviando email al proveedor:", error);
-          }*/
-          
+        if (pedidoPopulado.estado === "Aprobado") {     
           try {
             await sendEmail(
               pedidoPopulado.cliente.email,
@@ -1154,8 +1131,6 @@ const resolvers = {
           }
         }
         
-
-        
         if (pedidoPopulado.estado === "Observado") {
           await sendEmail(
             pedidoPopulado.vendedor.email,
@@ -1172,17 +1147,6 @@ const resolvers = {
               fechaAprobacion: new Date().toLocaleDateString(),
             }
           );
-          /*await sendEmail(
-            pedidoPopulado.vendedor.email,
-            "Pedido con observaciones - Acción requerida",
-            "orderStatusUpdatedObsVendor",
-            {
-              nombre: pedidoPopulado.cliente.nombre,
-              numeropedido: pedidoPopulado.numeropedido,
-              productos: productosConInfo,
-              total: pedidoPopulado.total,
-            }
-          );*/
         }
         
         return pedido;
