@@ -1024,16 +1024,13 @@ const resolvers = {
         if (Array.isArray(productosInput)) {
           // Sincroniza completamente el arreglo con lo recibido:
           // - Si un producto no viene en productosInput, se elimina.
-          // - Si cantidad <= 0, se elimina.
+          // - Si cantidad === 0, NO se borra; se mantiene con cantidad 0.
           // - Solo se agregan productos válidos existentes.
           const nuevasLineas = [];
           for (const { id: productoId, cantidad: nuevaCantidad } of productosInput) {
             if (!productoId || typeof nuevaCantidad !== "number") {
               console.warn(`Producto con ID ${productoId} o cantidad inválida`);
               continue;
-            }
-            if (nuevaCantidad <= 0) {
-              continue; // tratar como eliminación
             }
 
             const producto = await Producto.findById(productoId);
@@ -1044,7 +1041,7 @@ const resolvers = {
 
             nuevasLineas.push({
               id: producto._id,
-              cantidad: nuevaCantidad,
+              cantidad: nuevaCantidad < 0 ? 0 : nuevaCantidad,
             });
           }
 
