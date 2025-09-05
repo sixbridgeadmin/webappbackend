@@ -1021,12 +1021,14 @@ const resolvers = {
         }
 
         // Update productos if provided
-        if (productosInput && productosInput.length > 0) {
-          for (const {
-            id: productoId,
-            cantidad: nuevaCantidad,
-          } of productosInput) {
-            if (!productoId || nuevaCantidad === undefined) {
+        if (Array.isArray(productosInput)) {
+          // Sincroniza completamente el arreglo con lo recibido:
+          // - Si un producto no viene en productosInput, se elimina.
+          // - Si cantidad === 0, NO se borra; se mantiene con cantidad 0.
+          // - Solo se agregan productos válidos existentes.
+          const nuevasLineas = [];
+          for (const { id: productoId, cantidad: nuevaCantidad } of productosInput) {
+            if (!productoId || typeof nuevaCantidad !== "number") {
               console.warn(`Producto con ID ${productoId} o cantidad inválida`);
               continue;
             }
@@ -1037,47 +1039,37 @@ const resolvers = {
               continue;
             }
 
-            // Find the product in the pedido array
-            const productoEnPedido = pedido.pedido.find(
-              (p) => p.id.toString() === productoId
-            );
-            if (!productoEnPedido) {
-              console.warn(
-                `Producto con ID ${productoId} no está en el pedido`
-              );
-              continue;
-            }
-
-            // Update cantidad in the pedido array
-            productoEnPedido.cantidad = nuevaCantidad;
+            nuevasLineas.push({
+              id: producto._id,
+              cantidad: nuevaCantidad < 0 ? 0 : nuevaCantidad,
+            });
           }
 
+          // Reemplaza completamente el detalle del pedido
+          pedido.pedido = nuevasLineas;
           // Mark the pedido.pedido array as modified
           pedido.markModified("pedido");
         }
 
-        // Replace notas if provided
-        if (notas && notas.length > 0) {
-          pedido.notas = notas; // Replace the existing notas with the new ones
+        // Reemplazar notas (incluye permitir [] para limpiar)
+        if (Array.isArray(notas)) {
+          pedido.notas = notas;
           pedido.markModified("notas");
         }
 
-        // Use the envio value from the input
-        pedido.envio = envioInput;
+        // Actualizar envío si viene definido
+        if (typeof envioInput === "number") {
+          pedido.envio = envioInput;
+        }
 
         // Recalculate subtotal based on the updated pedido array
         let subtotal = 0;
-        for (const producto of pedido.pedido) {
-          const productoDetalle = await Producto.findById(producto.id);
-          subtotal += (productoDetalle?.precio || 0) * producto.cantidad;
+        for (const item of pedido.pedido) {
+          const productoDetalle = await Producto.findById(item.id);
+          subtotal += (productoDetalle?.precio || 0) * item.cantidad;
         }
-
-        // Recalculate total
-        const total = subtotal + pedido.envio;
-
-        // Update subtotal and total
         pedido.subtotal = subtotal;
-        pedido.total = total;
+        pedido.total = subtotal + (Number(pedido.envio) || 0);
 
         console.log("Updated Pedido:", pedido); // Log the updated pedido
 
@@ -1103,10 +1095,7 @@ const resolvers = {
         console.log("Numero pedido:", pedidoPopulado.numeropedido);
         console.log("Proveedor email:", pedidoPopulado.proveedor.email);
 
-        console.log(
-          "Datos completos del pedido:",
-          JSON.stringify(pedidoPopulado, null, 2)
-        );
+        console.log("Datos completos del pedido:", JSON.stringify(pedidoPopulado, null, 2));
 
         // En tu resolver (nuevoPedido), justo antes del sendEmail:
         const productosConInfo = await Promise.all(
@@ -1121,27 +1110,7 @@ const resolvers = {
           })
         );
 
-        
-        if (pedidoPopulado.estado === "Aprobado") {
-          //console.log("Enviando email al proveedor:", pedidoPopulado.proveedor.email);
-          console.log("Enviando email al cliente:", pedidoPopulado.cliente.email);
-
-          /*try {
-            await sendEmail(
-              pedidoPopulado.proveedor.email,
-              "Pedido Aprobado - Preparación Requerida",
-              "orderApprovedProvider",
-              {
-                name: pedidoPopulado.proveedor.nombre,
-                numeropedido: pedidoPopulado.numeropedido,
-                productos: productosConInfo,
-              }
-            );
-            console.log("Email enviado exitosamente al proveedor");
-          } catch (error) {
-            console.error("Error enviando email al proveedor:", error);
-          }*/
-          
+        if (pedidoPopulado.estado === "Aprobado") {     
           try {
             await sendEmail(
               pedidoPopulado.cliente.email,
@@ -1159,8 +1128,6 @@ const resolvers = {
           }
         }
         
-
-        
         if (pedidoPopulado.estado === "Observado") {
           await sendEmail(
             pedidoPopulado.vendedor.email,
@@ -1177,17 +1144,6 @@ const resolvers = {
               fechaAprobacion: new Date().toLocaleDateString(),
             }
           );
-          /*await sendEmail(
-            pedidoPopulado.vendedor.email,
-            "Pedido con observaciones - Acción requerida",
-            "orderStatusUpdatedObsVendor",
-            {
-              nombre: pedidoPopulado.cliente.nombre,
-              numeropedido: pedidoPopulado.numeropedido,
-              productos: productosConInfo,
-              total: pedidoPopulado.total,
-            }
-          );*/
         }
         
         return pedido;
