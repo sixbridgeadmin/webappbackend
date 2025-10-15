@@ -1021,6 +1021,7 @@ const resolvers = {
         }
 
         // Update productos if provided
+        
         if (Array.isArray(productosInput)) {
           // Sincroniza completamente el arreglo con lo recibido:
           // - Si un producto no viene en productosInput, se elimina.
