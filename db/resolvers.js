@@ -455,7 +455,9 @@ const resolvers = {
     },
     obtenerProductosProveedor: async (_, { skuproveedor }) => {
       try {
-        const productos = await Producto.find({ skuproveedor: skuproveedor });
+        const productos = await Producto.find({ skuproveedor: skuproveedor })
+          .collation({ locale: "es" })
+          .sort({ nombre: 1 });
         console.log("productos", productos);
         return productos;
       } catch (error) {
